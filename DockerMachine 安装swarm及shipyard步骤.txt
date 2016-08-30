@@ -1,0 +1,24 @@
+docker-machine create -d virtualbox cluster-store                                                  
+CLUSTER_STORE_IP=$(docker-machine ip cluster-store)
+
+docker $(docker-machine config cluster-store) run -d --restart="always" --publish="2379:2379" microbox/etcd:2.1.1 -name etcd0 -advertise-client-urls http://${CLUSTER_STORE_IP}:2379 -listen-client-urls http://0.0.0.0:2379 -initial-cluster-state new
+
+docker-machine create -d virtualbox --swarm --swarm-master --swarm-discovery="etcd://$(docker-machine ip cluster-store):2379/swarm" --engine-opt="cluster-advertise=eth1:2376" --engine-opt="cluster-store=etcd://$(docker-machine ip cluster-store):2379/store" swarm-0
+
+docker-machine create -d virtualbox --swarm --swarm-discovery="etcd://$(docker-machine ip cluster-store):2379/swarm" --engine-opt="cluster-advertise=eth1:2376" --engine-opt="cluster-store=etcd://$(docker-machine ip cluster-store):2379/store" swarm-1
+
+eval $(docker-machine env --swarm swarm-0)
+
+docker network create -d overlay multihost
+
+docker run -d --name="long-running" --net="multihost" --env="constraint:node==swarm-0" busybox top
+
+docker run -it --rm --net="multihost" --env="constraint:node==swarm-1" busybox ping long-running
+    
+
+--安装rethinkdb
+
+eval $(docker-machine env  swarm-0)
+
+docker run -ti -d --restart=always --name shipyard-rethinkdb rethinkdb
+docker run -ti -d --restart=always --name shipyard-controller --link shipyard-rethinkdb:rethinkdb  -e DOCKER_TLS_VERIFY="1" -e DOCKER_HOST="tcp://192.168.99.130:3376" -e DOCKER_MACHINE_NAME="swarm-0" -e DOCKER_CERT_PATH=/cert -v /Users/shimingliu/.docker/machine/machines/swarm-0:/cert -p 8080:8080 shipyard/shipyard:latest server -d tcp://192.168.99.130:3376
