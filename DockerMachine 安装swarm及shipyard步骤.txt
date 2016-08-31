@@ -29,10 +29,14 @@ eval $(docker-machine env  cluster-store)
 docker run -ti -d --restart=always --name shipyard-rethinkdb rethinkdb
 
 —安装shipyard控制台
-docker run -ti -d --restart=always --name shipyard-controller --link shipyard-rethinkdb:rethinkdb  -e DOCKER_TLS_VERIFY="1" -e DOCKER_HOST="tcp://192.168.99.130:3376" -e DOCKER_MACHINE_NAME="swarm-0" -e DOCKER_CERT_PATH=/cert -v /Users/shimingliu/.docker/machine/machines/swarm-0:/cert -p 8080:8080 shipyard/shipyard:latest server -d tcp://192.168.99.130:3376
+docker run -ti -d --restart=always --name shipyard-controller --link shipyard-rethinkdb:rethinkdb  -e DOCKER_TLS_VERIFY="1" -e DOCKER_HOST="tcp://192.168.99.135:3376" -e DOCKER_MACHINE_NAME="swarm-0" -e DOCKER_CERT_PATH=/cert -v /Users/shimingliu/.docker/machine/machines/swarm-0:/cert -p 8080:8080 shipyard/shipyard:latest server -d tcp://192.168.99.135:3376
 
 
 进入镜像内部
 docker run -it --rm zanjs/shipyard-cn:latest /bin/sh
 进入容器内部
 docker exec -it 6cde41ace2aa /bin/bash
+
+
+docker run -d -p 2181:2181 -p 2888:2888 -p 3888:3888 --net multihost  jplock/zookeeper
+
