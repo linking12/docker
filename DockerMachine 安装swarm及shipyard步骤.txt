@@ -37,6 +37,12 @@ docker run -it --rm zanjs/shipyard-cn:latest /bin/sh
 进入容器内部
 docker exec -it 6cde41ace2aa /bin/bash
 
+在不同的节点运行zookeeper
+docker run -d -p 2181:2181 -p 2888:2888 -p 3888:3888 --net=multihost --name=zookeeper1 -e constraint:node==swarm-1 jplock/zookeeper
+docker run -d -p 2181:2181 -p 2888:2888 -p 3888:3888 --net=multihost --name=zookeeper2 -e constraint:node==swarm-2 jplock/zookeeper
 
-docker run -d -p 2181:2181 -p 2888:2888 -p 3888:3888 --net multihost  jplock/zookeeper
+查看整个容器网络情况
+docker network inspect multihost
 
+容器1是否能ping通容器2
+docker exec zookeeper1 ping -c 3 10.0.0.3
