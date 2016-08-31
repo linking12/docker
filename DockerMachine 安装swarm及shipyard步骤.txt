@@ -40,6 +40,9 @@ docker exec -it 6cde41ace2aa /bin/bash
 在不同的节点运行zookeeper
 docker run -d -p 2181:2181 -p 2888:2888 -p 3888:3888 --net=multihost --name=zookeeper1 -e constraint:node==swarm-1 jplock/zookeeper
 docker run -d -p 2181:2181 -p 2888:2888 -p 3888:3888 --net=multihost --name=zookeeper2 -e constraint:node==swarm-2 jplock/zookeeper
+docker run -d -p 2181:2181 -p 2888:2888 -p 3888:3888 --net=multihost --name=zookeeper1 -e constraint:node==swarm-1 -e SERVER_ID=1 -e ADDITIONAL_ZOOKEEPER_1=server.1=zookeeper1:2888:3888 -e ADDITIONAL_ZOOKEEPER_2=server.2=zookeeper2:2888:3888 registry.aliyuncs.com/acs-sample/zookeeper:3.4.8
+docker run -d -p 2181:2181 -p 2888:2888 -p 3888:3888 --net=multihost --name=zookeeper2 -e constraint:node==swarm-2 -e SERVER_ID=2 -e ADDITIONAL_ZOOKEEPER_1=server.1=zookeeper1:2888:3888 -e ADDITIONAL_ZOOKEEPER_2=server.2=zookeeper2:2888:3888 registry.aliyuncs.com/acs-sample/zookeeper:3.4.8
+
 
 查看整个容器网络情况
 docker network inspect multihost
