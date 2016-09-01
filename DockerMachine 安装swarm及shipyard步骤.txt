@@ -36,14 +36,14 @@ docker run \
        --restart=always \
        --name shipyard-controller \
        -e DOCKER_TLS_VERIFY="1" \
-       -e DOCKER_HOST="tcp://192.168.99.135:3376" \
+       -e DOCKER_HOST="tcp://192.168.99.141:3376" \
        -e DOCKER_MACHINE_NAME="swarm-0" \
        -e DOCKER_CERT_PATH=/cert \
        -v /Users/shimingliu/.docker/machine/certs:/cert \
        -p 8080:8080 shipyard/shipyard:latest \
        server \
-       -d tcp://192.168.99.135:3376 \
-       --rethinkdb-addr "192.168.99.134:28015"
+       -d tcp://192.168.99.141:3376 \
+       --rethinkdb-addr "192.168.99.140:28015"
 
 进入镜像内部
 docker run -it --rm zanjs/shipyard-cn:latest /bin/sh
